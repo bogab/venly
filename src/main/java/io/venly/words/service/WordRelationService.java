@@ -37,7 +37,6 @@ public class WordRelationService {
                 .wordOne(request.wordOne())
                 .wordTwo(request.wordTwo())
                 .relation(request.relation())
-                .relation(request.relation())
                 .build();
 
         try {
@@ -59,14 +58,12 @@ public class WordRelationService {
 
         var results = new ArrayList<WordRelationDto>(length);
 
-        var i = 0;
         for (WordRelation e : entities) {
-            results.add(i++, new WordRelationDto(e.getWordOne(), e.getWordTwo(), e.getRelation(), false));
+            results.add(new WordRelationDto(e.getWordOne(), e.getWordTwo(), e.getRelation(), false));
             if (includeInverse) {
-                results.add(i++, new WordRelationDto(e.getWordTwo(), e.getWordOne(), e.getRelation(), true));
+                results.add(new WordRelationDto(e.getWordTwo(), e.getWordOne(), e.getRelation(), true));
             }
         }
-
         return results;
     }
 
