@@ -1,6 +1,7 @@
 package io.venly.words.service;
 
 import io.venly.words.dto.WordRelationDto;
+import io.venly.words.entity.RelationType;
 import io.venly.words.entity.WordRelation;
 import io.venly.words.repository.WordRelationRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,8 +31,10 @@ public class WordRelationService {
         return wordRelationRepository.save(wordRelation);
     }
 
-    public List<WordRelationDto> getWordRelations() {
-        return wordRelationRepository.findAll().stream()
+    public List<WordRelationDto> getWordRelations(Optional<RelationType> relation) {
+        return relation.map(wordRelationRepository::findAllByRelation)
+                .orElseGet(wordRelationRepository::findAll)
+                .stream()
                 .map(r -> new WordRelationDto(r.getWordOne(), r.getWordTwo(), r.getRelation()))
                 .toList();
     }
