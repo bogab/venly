@@ -29,8 +29,8 @@ public class WordRelationController {
     }
 
     @GetMapping
-    public List<WordRelationDto> getWordRelations(@RequestParam Optional<RelationType> relation) {
-        return wordRelationService.getWordRelations(relation);
+    public List<WordRelationDto> getWordRelations(@RequestParam Optional<RelationType> relation, @RequestParam Optional<Boolean> inverse) {
+        return wordRelationService.getWordRelations(relation, inverse);
     }
 
 }

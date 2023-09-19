@@ -10,7 +10,8 @@ public record WordRelationDto(
         @NotEmpty(message = "Word two is required")
         String wordTwo,
         @NotNull(message = "Relation is required")
-        RelationType relation
+        RelationType relation,
+        Boolean inverse
 
 ) {
 }
