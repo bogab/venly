@@ -4,8 +4,10 @@ import io.venly.words.dto.WordRelationDto;
 import io.venly.words.entity.RelationType;
 import io.venly.words.entity.WordRelation;
 import io.venly.words.repository.WordRelationRepository;
+import io.venly.words.exception.RelationAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,7 +32,11 @@ public class WordRelationService {
                 .relation(request.relation())
                 .build();
 
-        return wordRelationRepository.save(wordRelation);
+        try {
+           return wordRelationRepository.save(wordRelation);
+        } catch (DataIntegrityViolationException e) {
+            throw new RelationAlreadyExistsException(request.wordOne(), request.wordTwo());
+        }
     }
 
     public List<WordRelationDto> getWordRelations(Optional<RelationType> relation, Optional<Boolean> inverse) {

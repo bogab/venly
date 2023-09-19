@@ -1,0 +1,1 @@
+create unique index on public.word_relations (LEAST(word_one, word_two), GREATEST(word_one, word_two));

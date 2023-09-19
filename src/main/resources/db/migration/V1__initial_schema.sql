@@ -1,6 +1,4 @@
-drop table if exists word_relations;
-
-create table word_relations
+create table public.word_relations
 (
     id       serial primary key,
     word_one text not null,
