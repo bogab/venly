@@ -33,4 +33,9 @@ public class WordRelationController {
         return wordRelationService.getWordRelations(relation, inverse);
     }
 
+    @GetMapping(value = "/search")
+    public List<String> pathSearch(@RequestParam String source, @RequestParam String target) {
+        return wordRelationService.searchPath(source, target);
+    }
+
 }

@@ -11,4 +11,7 @@ import java.util.List;
 public interface WordRelationRepository extends JpaRepository<WordRelation, Long> {
 
     List<WordRelation> findAllByRelation(RelationType relation);
+
+    List<WordRelation> findAllByWordOneOrWordTwo(String wordOne, String wordTwo);
+
 }

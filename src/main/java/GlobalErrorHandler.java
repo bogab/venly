@@ -1,6 +1,7 @@
 package io.venly.words;
 
 import io.venly.words.dto.ErrorResponse;
+import io.venly.words.exception.PathNotFoundException;
 import io.venly.words.exception.RelationAlreadyExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +39,22 @@ public class GlobalErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(RelationAlreadyExistsException.class)
-    public Object handleRelationAlreadyPresentException(RelationAlreadyExistsException exception) {
+    public Object handleRelationAlreadyExistsException(RelationAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST, exception.getMessage()));
+    }
+
+    @ExceptionHandler(PathNotFoundException.class)
+    public Object handlePathNotFoundException(PathNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST, exception.getMessage()));
+    }
+
+    @ExceptionHandler
+    ResponseEntity<ErrorResponse> handleUnknownError(Exception exception) {
+        log.error("Handling internal server error", exception);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage()));
     }
 
 
