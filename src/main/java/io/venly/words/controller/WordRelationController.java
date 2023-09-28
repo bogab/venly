@@ -5,6 +5,8 @@ import io.venly.words.entity.RelationType;
 import io.venly.words.service.WordRelationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,19 +25,19 @@ public class WordRelationController {
     private final WordRelationService wordRelationService;
 
     @PostMapping
-    public Long createWordRelation(@RequestBody @Valid WordRelationDto request) {
+    public ResponseEntity<Long> createWordRelation(@RequestBody @Valid WordRelationDto request) {
         var wordRelation = wordRelationService.createWordRelation(request);
-        return wordRelation.getId();
+        return ResponseEntity.status(HttpStatus.CREATED).body(wordRelation.getId());
     }
 
     @GetMapping
-    public List<WordRelationDto> getWordRelations(@RequestParam Optional<RelationType> relation, @RequestParam Optional<Boolean> inverse) {
-        return wordRelationService.getWordRelations(relation, inverse);
+    public ResponseEntity<List<WordRelationDto>> getWordRelations(@RequestParam Optional<RelationType> relation, @RequestParam Optional<Boolean> inverse) {
+        return ResponseEntity.ok(wordRelationService.getWordRelations(relation, inverse));
     }
 
-    @GetMapping(value = "/search")
-    public List<String> pathSearch(@RequestParam String source, @RequestParam String target) {
-        return wordRelationService.searchPath(source, target);
+    @GetMapping(value = "/path")
+    public ResponseEntity<List<String>> pathSearch(@RequestParam String source, @RequestParam String target) {
+        return ResponseEntity.ok(wordRelationService.searchPath(source, target));
     }
 
 }

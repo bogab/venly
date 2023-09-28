@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -29,6 +28,7 @@ public class WordRelationService {
 
     private final WordRelationRepository wordRelationRepository;
 
+    @Transactional
     public WordRelation createWordRelation(WordRelationDto request) {
 
         log.info("Create a relation between: {} <-> {} of type {}", request.wordOne(), request.wordTwo(), request.relation());
@@ -46,6 +46,7 @@ public class WordRelationService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<WordRelationDto> getWordRelations(Optional<RelationType> relation, Optional<Boolean> inverse) {
         log.info("Fetching relations");
 
@@ -71,36 +72,26 @@ public class WordRelationService {
     public List<String> searchPath(String source, String target) {
         log.info("Searching for a path between: {} <-> {}", source, target);
         var pathFound = false;
-        var visited = new HashSet<String>();
-        var queue = new LinkedList<String>();
+        var visited = new HashSet<>(List.of(source));
+        var queue = new LinkedList<>(List.of(source));
         var parentNodes = new HashMap<String, String>();
-
-        visited.add(source);
-        queue.add(source);
 
         while (!queue.isEmpty() && !pathFound) {
             var parent = queue.poll();
-            var children = wordRelationRepository.findAllByWordOneOrWordTwo(parent, parent).stream()
+            pathFound = wordRelationRepository.findAllByWordOneOrWordTwo(parent, parent).stream()
                     .flatMap(r -> Stream.of(r.getWordOne(), r.getWordTwo()))
-                    .filter(w -> !visited.contains(w))
-                    .collect(Collectors.toSet());
-            for (String word : children) {
-                if (visited.add(word)) {
-                    queue.add(word);
-                    parentNodes.put(word, parent);
-                }
-                if (target.equals(word)) {
-                    pathFound = true;
-                    break;
-                }
-            }
+                    .filter(visited::add)
+                    .peek(word -> {
+                        queue.add(word);
+                        parentNodes.put(word, parent);
+                    }).anyMatch(word -> word.equals(target));
         }
         if (!pathFound) {
             log.info("A path between {} <-> {} could not be found", source, target);
             throw new PathNotFoundException(source, target);
         }
-        List<String> shortestPath = new ArrayList<>();
         var word = target;
+        var shortestPath = new ArrayList<String>();
         while (word != null) {
             shortestPath.add(word);
             word = parentNodes.get(word);
